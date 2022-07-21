@@ -19,7 +19,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
-import org.zerock.myapp.domain.BoardVO;
+import org.zerock.myapp.domain.CutomerVO;
 
 import lombok.Cleanup;
 import lombok.NoArgsConstructor;
@@ -29,83 +29,47 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor
 
 @TestInstance(Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class) 
-public class TTTTests {
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class SqlSessionTests2 {
+	
 	private SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
 	private SqlSessionFactory sqlSessionFactory;
 	
+
 	@BeforeAll
 	void beforeAll() throws IOException {
 		log.trace("\t+ beforeAll() invoked");
 		
-		String myBatisConfigXml = "mybatis-config.xml";
+		String mybatis = "mybatis-config.xml";
 		@Cleanup
-		InputStream is = Resources.getResourceAsStream(myBatisConfigXml);
+		InputStream is = Resources.getResourceAsStream(mybatis);
 		Objects.requireNonNull(is);
 		
 		this.sqlSessionFactory = builder.build(is);
-		log.trace("\t+ this.sqlSessionFactory: {}", this.sqlSessionFactory);
 		
-	}//beforeAll()
+	}// beforeAll()
 	
 	
 	@Test
 	@Order(1)
-	@DisplayName("1. selectAllBoards")
-	@Timeout(value=10, unit=TimeUnit.SECONDS)
-	void selectAllBoards() {
-		log.trace("selectAllBoards() invoked");
+	@DisplayName("1. selectAllCustomer")
+	@Timeout(unit = TimeUnit.SECONDS, value = 10)
+	void selectAllCustomer() {
+		log.trace("\t+ selectAllCustomer() invoked");
 		
 		SqlSession sqlSession = this.sqlSessionFactory.openSession();
 		
-		try (sqlSession){
+		try(sqlSession){
+			String namespace = "Customer";
+			String sqlId = "selectAllCustomer";
+			String sql = namespace + "." + sqlId;
 			
-			String namespce = "TTT";
-			String sqlId = "selectAllBoards";
-			String sql = namespce + "." + sqlId;
-			List<BoardVO> list = sqlSession.selectList(sql);
-			
+			List<CutomerVO> list = sqlSession.selectList(sql);
 			Objects.requireNonNull(list);
-			list.forEach(log::info);
 			
-		}// try-with resources
-		
-	}//selectAllBoards()
-	
-	
-	
-	
+			list.forEach(e -> log.info(e));
+			
+		}// try-with-resource
+	}// selectAllCustomer()
 	
 }// end class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

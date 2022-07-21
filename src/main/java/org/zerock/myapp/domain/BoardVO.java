@@ -4,10 +4,10 @@ import lombok.Value;
 
 @Value
 public class BoardVO {
-	private Integer bno;
-	private String title;
-	private String content;
-	private String writer;
+
+	private Integer BNO;
+	private String TITLE;
+	private String CONTENT;
+	private String WRITER;
 	
-	
-}// end class
+}//end class
