@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,25 +33,23 @@ import lombok.extern.log4j.Log4j2;
 public class SqlSessionFactoryTests {
 
 	private SqlSessionFactory sqlSessionFactory;
-	private SqlSessionFactoryBuilder sqlSessionFactoryBuilder;
+	private SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();		//builder를 얻음
 	
 	
 	@BeforeAll
 	void beforeAll() throws IOException {
 		log.trace("beforeAll() invoked");
 		
+//		mybatis설정 파일명을 변수에 저장
 		String config = "mybatis-config.xml";
+		
 		@Cleanup
 		InputStream is = Resources.getResourceAsStream(config);
-		
-		this.sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
-		Objects.requireNonNull(this.sqlSessionFactoryBuilder);
-		log.info("\t+ this.sqlSessionFactoryBuilder = {}", this.sqlSessionFactoryBuilder);
 	
+//		공장을 만듦
 		this.sqlSessionFactory = this.sqlSessionFactoryBuilder.build(is);
 		assertNotNull(this.sqlSessionFactory);
 		log.info("\t+ this.sqlSessionFactory = {}", this.sqlSessionFactory);
-		
 		
 	}//beforeAll()
 	
@@ -58,12 +57,26 @@ public class SqlSessionFactoryTests {
 //	@Disabled
 	@Test
 	@Order(1)
-	@DisplayName("contextLoads")
-	@Timeout(value = 1000, unit = TimeUnit.MILLISECONDS)
-	void contextLoads() {
-		log.trace("contextLoads2() invoked");
+	@DisplayName("getSqlSession")
+	@Timeout(value=2000, unit=TimeUnit.MILLISECONDS)
+	void getSqlSession() throws Exception {
+		log.trace("getSqlSession() invoked");
 		
-	}// contextLoads2()
+//		SqlSessionFactory 객체로부터 SqlSession 객체를 얻어내자
+//		SqlSession은 Closeable인터페이스를 구현하는 클래스므로 꼭 닫아줘야 한다! 
+		@Cleanup("close")	//자원닫기 방법#1
+		SqlSession sqlSession = this.sqlSessionFactory.openSession();
+		Objects.requireNonNull(sqlSession);
+		log.info("\t+ sqlSession: {}", sqlSession);
+		
+		try (sqlSession) {		//SQL 문장처리를 프레임워크에 의뢰
+			
+		}// try-with-resources	//자원닫기 방법#2
+		
+//		sqlSession.close();		//자원닫기 방법#3
+		
+	}// getSqlSession()
+	
 	
 }// end class
 
