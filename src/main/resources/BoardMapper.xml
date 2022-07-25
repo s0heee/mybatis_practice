@@ -1,14 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="TTT">
+<mapper namespace="BoardMapper">
 
 	<!-- 관례상 id는 메소드 이름으로 resultType는 어떤 타입으로 받을지-->
 	<select id="selectAllBoards" resultType="org.zerock.myapp.domain.BoardVO">
-		select * from TBL_BOARD
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+	</select>
+
+	<select id="selectBoard" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer 
+		FROM TBL_BOARD 
+		WHERE bno = #{bno} 
+	</select>
+
+	<!-- 게시판 검색조건에 맞게, 특정 게시글 번호로 검색해서 리턴#1(불안정) -->
+	<select id="findBoardByBno" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD 
+		WHERE
+		<if test="bno != null">
+			bno = #{bno}
+		</if>
+	</select>
+
+	<!-- 게시판 검색조건에 맞게, 특정 게시글 제목로 검색해서 리턴#2(안정) -->
+	<select id="findBoardByTitle" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+		
+		<where>
+			<if test="title != null">
+				title LIKE '%'||#{title}||'%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 게시판 검색조건에 맞게, 특정 게시글 작성자로 검색해서 리턴#3(안정) -->
+	<select id="findBoardByWriter" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+		
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="writer != null">
+				writer Like '%'||#{writer}||'%'
+			</if>
+		</trim>
+	</select>
+
+	<!-- 게시판 검색조건에 맞게, 특정 게시글 번호와 제목으로 검색해서 리턴#4(안정) -->
+	<select id="findBoardsByBnoAndTitle" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+		
+		<!-- 다중조건식(체크조건이 여러개인 경우) -->
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="bno != null">
+				bno = #{bno}
+			</if>
+
+			<if test="title != null">
+				AND title LIKE '%'||#{title}||'%'
+			</if>
+		</trim>
+	</select>
+
+	<!-- 게시판 검색조건에 맞게, 특정 게시글 번호 또는 제목으로 검색해서 리턴#5(안정) -->
+	<select id="findBoardsByBnoOrTitle" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+		
+		<where>
+			<choose>
+				<when test="bno != null">
+					bno = #{bno}
+				</when>
+
+				<when test="title != null">
+					AND title LIKE '%'||#{title}||'%'
+				</when>
+
+				<otherwise>
+					AND content LIKE '%'||#{content}||'%'
+				</otherwise>
+			</choose>
+		</where>
+	</select>
+
+	<!-- 게시판 검색조건에 맞게, 특정 게시글 번호 또는 제목으로 검색해서 리턴#5(안정) -->
+	<select id="findBoardsBySomeBnos" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+		
+		<where>
+			bno IN
+
+			<foreach collection="list" item="bno" index="index" open="(" close=")" separator=",">
+				#{bno}
+			</foreach>
+		</where>
 	</select>
 
 </mapper>

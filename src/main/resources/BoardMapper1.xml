@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TTT">
+
+	<!-- 관례상 id는 메소드 이름으로 resultType는 어떤 타입으로 받을지-->
+	<select id="selectAllBoards" resultType="org.zerock.myapp.domain.BoardVO">
+		select * from TBL_BOARD
+	</select>
+	
+	<select id="select_2" resultType="org.zerock.myapp.domain.BoardVO">
+		SELECT bno, title, content, writer FROM TBL_BOARD WHERE bno = #{bno} 
+	</select>
+	
+	<select id="select_3" resultType="org.zerock.myapp.domain.BoardVO">
+		<![CDATA[ 
+		SELECT bno, title, content, writer
+		FROM TBL_BOARD
+		WHERE 
+			bno > #{bno}
+			And title > #{title}
+		]]>
+	</select>
+
+</mapper>

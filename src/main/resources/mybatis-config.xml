@@ -6,17 +6,18 @@
 
   <environments default="development">
 
-    <environment id="development">	<!-- 개발환경 -->
+    <!-- 개발환경 -->
+    <environment id="development">
       <transactionManager type="JDBC" />
 
       <dataSource type="UNPOOLED">
         <!-- driver spy를 사용하지 않았을 때 -->
-        <property name="driver" value="oracle.jdbc.OracleDriver"/>
-        <property name="url" value="jdbc:oracle:thin:@db202204131245_high?TNS_ADMIN=C:/opt/OracleCloudWallet/ATP"/>
+        <!-- <property name="driver" value="oracle.jdbc.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@db202204131245_high?TNS_ADMIN=C:/opt/OracleCloudWallet/ATP" /> -->
 
         <!-- driver spy를 사용할 때 -->
-        <!-- <property name="driver" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy" />
-        <property name="url" value="jdbc:log4jdbc:oracle:thin:@db202204131245_high?TNS_ADMIN=C:/opt/OracleCloudWallet/ATP" /> -->
+        <property name="driver" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy" />
+        <property name="url" value="jdbc:log4jdbc:oracle:thin:@db202204131245_high?TNS_ADMIN=C:/opt/OracleCloudWallet/ATP" />
 
         <property name="username" value="ADMIN" />
         <property name="password" value="Oracle1234567" />
@@ -29,7 +30,8 @@
     </environment>
 
 
-    <environment id="production">	<!-- 실행환경 -->
+    <!-- 실행환경 -->
+    <environment id="production">
       <transactionManager type="JDBC" />
 
       <dataSource type="POOLED">
@@ -54,10 +56,17 @@
     </environment>
 
   </environments>
-  
+
+  <!-- 관리할 모든 SQL Mapper XML 파일 등록하기 -->
   <mappers>
-  	<mapper resource="BoardMapper.xml"/>
-  	<mapper resource="CustomerMapper.xml"/>
+    <mapper resource="BoardMapper.xml" />
+    <mapper resource="CustomerMapper.xml" />
+    <mapper resource="mappers/UserMapper.xml" />
+    <!-- 
+    <mapper class="org.zerock.myapp.mapper.BoardMapper" />
+    <mapper class="org.zerock.myapp.mapper.UserMapper" />
+    -->
+    <package name="org.zerock.myapp.mapper" />
   </mappers>
-  
+
 </configuration>

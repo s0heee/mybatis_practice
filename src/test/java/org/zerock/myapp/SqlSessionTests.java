@@ -2,7 +2,9 @@ package org.zerock.myapp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +22,9 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
 import org.zerock.myapp.domain.BoardVO;
+import org.zerock.myapp.domain.UserVO;
+import org.zerock.myapp.mapper.BoardMapper;
+import org.zerock.myapp.mapper.UserMapper;
 
 import lombok.Cleanup;
 import lombok.NoArgsConstructor;
@@ -81,6 +86,161 @@ public class SqlSessionTests {
 		
 		
 	}// selectAllBoards()
+	
+	
+////	@Disabled
+//	@Test
+//	@Order(2)
+//	@DisplayName("2. selectOneBoards()")
+//	@Timeout(unit=TimeUnit.SECONDS, value = 10)
+//	void selectOneBoards() {
+//		log.trace("\t+ selectOneBoards() invoked");
+//		
+//		SqlSession sqlSession = this.sqlSessionFactory.openSession();
+//		
+//		try(sqlSession){
+//			
+//			String namespace = "TTT";
+//			String sqlId = "select_2";
+//			String sql = namespace + "." + sqlId;
+//			
+//			BoardVO vo = sqlSession.selectOne(sql);
+//			Objects.requireNonNull(vo);
+//			
+//			log.info(vo);
+//			
+//		}//try-with-resource
+//	
+//	}// selectOneBoards()
+	
+	
+//	@Disabled
+	@Test
+	@Order(3)
+	@DisplayName("3. selectBoardsByTwoCondition()")
+	@Timeout(unit=TimeUnit.SECONDS, value = 10)
+	void selectBoardsByTwoCondition() {
+		log.trace("\t+ selectBoardsByTwoCondition() invoked");
+		
+		SqlSession sqlSession = this.sqlSessionFactory.openSession();
+		
+		try (sqlSession){
+			String namespace = "TTT";
+			String sqlId = "select_3";
+			String sql = namespace + "." + sqlId;
+			
+			Map<String, Object> params = new HashMap<>();
+			params.put("bno", 5);
+			params.put("title", "TITLE_2");
+			
+			List<BoardVO> list = sqlSession.selectList(sql, params);
+			Objects.requireNonNull(list);
+			
+			list.forEach(e -> log.info(e));
+					
+					
+		}//t-w-r
+		
+	}// selectBoardsByTwoCondition()
+	
+	
+//	@Disabled
+	@Test
+	@Order(4)
+	@DisplayName("4. insertNewUSer()")
+	@Timeout(unit=TimeUnit.SECONDS, value = 10)
+	void insertNewUser() {
+		log.trace("\t+ insertNewUser() invoked");
+		
+		SqlSession sqlSession = this.sqlSessionFactory.openSession(false);	//SET AUTOCOMMIT OFF
+		
+		try (sqlSession){
+			
+			String namespace = "mappers.UserMapper";
+			String sqlId = "insertNewUser";
+			String sql = namespace + "." + sqlId;
+			
+//			바인드변수에 전달할 파라미터 값 생성하면서 한번에 여러개의 레코드를 INSERT함
+			for(int i=2; i<10; i++) {
+	
+				Map<String, Object> params = new HashMap<>();
+				params.put("userid", "USER_"+i);
+				params.put("userpw", "PASS_"+i);
+				params.put("username", "NAME_"+i);
+				
+				//MAP 객체를 파라미터로 전달하면서 MApped Statement 수행(DML)
+				int insertedRows = sqlSession.insert(sql, params);
+				log.info("\t+ insertedRows: {}", insertedRows);
+				
+			}// for
+			
+			sqlSession.commit();
+			log.info("\t+ Commited");		//TCL: ALL or NOTHING
+		} catch (Exception e) {
+			sqlSession.rollback();
+			log.info("\t+ Rolled back");
+			
+			throw e;
+		} // try- catch
+		
+	}// insertNewUSer()
+	
+	
+//	@Disabled
+	@Test
+	@Order(5)
+	@DisplayName("5. selectAllBoardsByMapperInterface()")
+	@Timeout(unit=TimeUnit.SECONDS, value = 10)
+	void selectAllBoardsByMapperInterface() {
+		log.trace("selectAllBoardsByMapperInterface() invoked");
+		
+		SqlSession sqlSession = this.sqlSessionFactory.openSession();
+		
+		//Mapper Interface를 이용한 SQL문장처리
+		try(sqlSession){
+			//step#1. 설정파일에 등록된 Mapper Interface의 구현객체를 획득
+			BoardMapper mapper = sqlSession.<BoardMapper>getMapper(BoardMapper.class);
+			Objects.requireNonNull(mapper);
+			log.info("\t + mapper: {}", mapper);
+			
+			//step#2. 동적 Proxy 객체를 통해 Mapper 인터페이스에 선언된 메소드 호출1
+			List<BoardVO> list = mapper.selectAllBoards();
+			Objects.requireNonNull(list);
+			list.forEach(e -> log.info(e));
+			
+			//step#3. 동적 proxy 객체를 통해 Mapper 인터페이스에 선언된 메소드 호출2
+			BoardVO vo = mapper.selectBoard(33);
+			Objects.requireNonNull(vo);
+			log.info(vo);
+			
+		}// try-with-resource
+	
+	}// selectAllBoardsByMapperInterface()
+	
+	
+//	@Disabled
+	@Test
+	@Order(6)
+	@DisplayName("6. selectUsers()")
+	@Timeout(unit=TimeUnit.SECONDS, value = 10)
+	void selectUsers() {
+		log.trace("selectUsers() invoked");
+		
+		SqlSession sqlSession = this.sqlSessionFactory.openSession();
+		
+		try (sqlSession){
+			UserMapper mapper = sqlSession.<UserMapper>getMapper(UserMapper.class);
+			Objects.requireNonNull(mapper);
+			log.info("\t+ mapper: {}" , mapper);
+			
+			List<UserVO> list = mapper.selectUsers("USER_4", "NAME_2");
+			Objects.requireNonNull(list);
+			
+			list.forEach(e-> log.info(e));
+			
+		}// try-with-resource
+		
+	}// selectUsers()
 	
 }// end class
 

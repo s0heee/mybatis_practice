@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace관례 = Mapper가 속해있는 경로명.Mapper이름 -->
+<mapper namespace="mappers.UserMapper">
+    
+    <!-- id관례 = SQL문장을 수행시킬 메소드의 이름 -->
+    <insert id="insertNewUser">
+        INSERT INTO tbl_user (userid, userpw, username)
+        VALUES(#{userid}, #{userpw}, #{username})
+    </insert>
+
+</mapper>
