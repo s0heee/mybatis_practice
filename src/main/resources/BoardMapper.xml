@@ -34,6 +34,7 @@
 		<where>
 			<if test="title != null">
 				title LIKE '%'||#{title}||'%'
+				<!-- title LIKE #{title} -->
 			</if>
 		</where>
 	</select>
@@ -82,9 +83,9 @@
 					AND title LIKE '%'||#{title}||'%'
 				</when>
 
-				<otherwise>
+				<!--<otherwise>
 					AND content LIKE '%'||#{content}||'%'
-				</otherwise>
+				</otherwise>-->
 			</choose>
 		</where>
 	</select>
@@ -95,9 +96,7 @@
 		FROM TBL_BOARD
 		
 		<where>
-			bno IN
-
-			<foreach collection="list" item="bno" index="index" open="(" close=")" separator=",">
+			<foreach collection="list" item="bno" index="index" open="bno IN(" close=")" separator=",">
 				#{bno}
 			</foreach>
 		</where>
